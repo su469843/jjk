@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
-import { getFileByShareCode, updateFile } from '@/lib/datastore';
+import { getFileByShareCode, updateFile, initDatabase } from '@/lib/datastore';
+
+// 初始化数据库
+initDatabase().catch(console.error);
 
 export async function POST(
   request: NextRequest,

@@ -1,7 +1,10 @@
 import { put } from '@vercel/blob';
 import { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { generateUniqueShareCode, saveFile } from '@/lib/datastore';
+import { generateUniqueShareCode, saveFile, initDatabase } from '@/lib/datastore';
+
+// 初始化数据库
+initDatabase().catch(console.error);
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
-import { getFileByShareCode } from '@/lib/datastore';
+import { getFileByShareCode, initDatabase } from '@/lib/datastore';
+
+// 初始化数据库
+initDatabase().catch(console.error);
 
 export async function GET(
   request: NextRequest,

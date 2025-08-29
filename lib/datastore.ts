@@ -13,7 +13,7 @@ if (!databaseUrl) {
 }
 
 // 创建 PostgreSQL 连接池
-const dbPool = new Pool({
+const pool = new Pool({
   connectionString: databaseUrl,
   ssl: {
     rejectUnauthorized: false
@@ -36,7 +36,7 @@ export interface FileInfo {
 
 // 初始化数据库表
 async function initializeDatabase() {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     // 创建文件信息表
@@ -75,7 +75,7 @@ async function initializeDatabase() {
 
 // 读取所有文件信息
 export async function getAllFiles(): Promise<FileInfo[]> {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     const result = await client.query(
@@ -101,7 +101,7 @@ export async function getAllFiles(): Promise<FileInfo[]> {
 
 // 根据分享码查找文件
 export async function getFileByShareCode(shareCode: string): Promise<FileInfo | undefined> {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     const result = await client.query(
@@ -133,7 +133,7 @@ export async function getFileByShareCode(shareCode: string): Promise<FileInfo | 
 
 // 根据ID查找文件
 export async function getFileById(id: string): Promise<FileInfo | undefined> {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     const result = await client.query(
@@ -165,7 +165,7 @@ export async function getFileById(id: string): Promise<FileInfo | undefined> {
 
 // 保存文件信息
 export async function saveFile(fileInfo: FileInfo) {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     await client.query(
@@ -193,7 +193,7 @@ export async function saveFile(fileInfo: FileInfo) {
 
 // 更新文件信息
 export async function updateFile(id: string, updates: Partial<FileInfo>) {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     const fields: string[] = [];
@@ -258,7 +258,7 @@ export async function updateFile(id: string, updates: Partial<FileInfo>) {
 
 // 删除文件信息
 export async function deleteFile(id: string) {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     const result = await client.query(
@@ -274,7 +274,7 @@ export async function deleteFile(id: string) {
 
 // 生成唯一的5位数字分享码
 export async function generateUniqueShareCode(): Promise<string> {
-  const client = await dbPool.connect();
+  const client = await pool.connect();
   
   try {
     let shareCode: string;
