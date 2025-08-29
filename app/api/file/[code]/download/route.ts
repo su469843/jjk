@@ -6,9 +6,10 @@ initDatabase().catch(console.error);
 
 export async function POST(
   _request: NextRequest,
-  { params }: { params: { code: string } }
+  context: { params: Promise<{ code: string }> }
 ) {
   try {
+    const params = await context.params;
     const file = await getFileByShareCode(params.code);
     
     if (!file) {
