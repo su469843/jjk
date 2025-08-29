@@ -209,8 +209,9 @@ export async function updateFile(id: string, updates: Partial<FileInfo>): Promis
   const client: PoolClient = await pool.connect();
   
   try {
-    const fields: string[] = [];
-    const values: any[] = [];
+  const fields: string[] = [];
+  // values can be string, number or Date depending on the field being updated
+  const values: (string | number | Date)[] = [];
     let index = 1;
     
     // 构建更新字段
