@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* 自定义动画 */
+@keyframes showModalContent {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes showModalOverlay {
+  0% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bg-pulse {
+  0%, to {
+    background-color: #e2e8f0;
+  }
+  50% {
+    background-color: #f1f5f9;
+  }
+}
+
+@keyframes notification-pulse {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: .8;
+  }
+  75%, to {
+    box-shadow: 0 0 0 8px currentColor;
+    opacity: 0;
+  }
+}
+
+.modal-content {
+  animation: showModalContent 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay {
+  animation: showModalOverlay 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-bg-pulse {
+  animation: bg-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-notification-pulse {
+  animation: notification-pulse 1.6s ease infinite both;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* 表格响应式优化 */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table-responsive table {
+    min-width: 600px;
+  }
+}
