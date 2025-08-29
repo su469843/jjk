@@ -1,7 +1,7 @@
 import { put } from '@vercel/blob';
 import { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { generateUniqueShareCode, saveFile, initDatabase } from '@/lib/datastore';
+import { generateUniqueShareCode, saveFile, initDatabase, FileInfo } from '@/lib/datastore';
 
 // 初始化数据库
 initDatabase().catch(console.error);
@@ -19,11 +19,11 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: '请选择文件或提供外部链接' }, { status: 400 });
     }
 
-    let fileInfo: any = {
+    const fileInfo: FileInfo = {
       id: uuidv4(),
       fileName: '',
       shareCode: await generateUniqueShareCode(),
-      type: 'blob' as const,
+      type: 'blob',
       downloadLimit,
       downloadCount: 0,
       expiresAt,
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       fileInfo.blobUrl = blob.url;
     } else if (externalUrl) {
       // 处理外部链接
-      fileInfo.type = 'externalLink' as const;
+      fileInfo.type = 'externalLink';
       fileInfo.fileName = new URL(externalUrl).pathname.split('/').pop() || 'external-file';
       fileInfo.externalUrl = externalUrl;
     }

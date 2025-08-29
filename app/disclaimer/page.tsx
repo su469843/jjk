@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function DisclaimerPage() {
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -32,7 +34,7 @@ export default function DisclaimerPage() {
             <p>本服务基于Vercel平台提供，可能因平台策略或技术原因随时变更或终止，恕不另行通知。</p>
             
             <h3>6. 免责声明</h3>
-            <p>在法律允许的最大范围内，本服务按"现状"提供，不提供任何形式的担保。对于因使用本服务而产生的任何直接或间接损失，本服务不承担任何责任。</p>
+            <p>在法律允许的最大范围内，本服务按&quot;现状&quot;提供，不提供任何形式的担保。对于因使用本服务而产生的任何直接或间接损失，本服务不承担任何责任。</p>
             
             <h3>7. 法律适用</h3>
             <p>本声明的解释和适用均适用中华人民共和国法律法规。</p>
@@ -43,12 +45,12 @@ export default function DisclaimerPage() {
             </div>
             
             <div className="mt-8 text-center">
-              <a 
+              <Link 
                 href="/" 
                 className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               >
                 返回首页
-              </a>
+              </Link>
             </div>
           </div>
         </div>

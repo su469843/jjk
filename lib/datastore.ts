@@ -1,5 +1,5 @@
 // 使用PostgreSQL数据库存储文件元数据
-import { Pool } from 'pg';
+import { Pool, QueryResult } from 'pg';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,7 +35,7 @@ export interface FileInfo {
 }
 
 // 初始化数据库表
-async function initializeDatabase() {
+async function initializeDatabase(): Promise<void> {
   const client = await pool.connect();
   
   try {
@@ -78,7 +78,7 @@ export async function getAllFiles(): Promise<FileInfo[]> {
   const client = await pool.connect();
   
   try {
-    const result = await client.query(
+    const result: QueryResult<any> = await client.query(
       'SELECT * FROM file_info ORDER BY upload_time DESC'
     );
     
@@ -104,7 +104,7 @@ export async function getFileByShareCode(shareCode: string): Promise<FileInfo | 
   const client = await pool.connect();
   
   try {
-    const result = await client.query(
+    const result: QueryResult<any> = await client.query(
       'SELECT * FROM file_info WHERE share_code = $1',
       [shareCode]
     );
@@ -136,7 +136,7 @@ export async function getFileById(id: string): Promise<FileInfo | undefined> {
   const client = await pool.connect();
   
   try {
-    const result = await client.query(
+    const result: QueryResult<any> = await client.query(
       'SELECT * FROM file_info WHERE id = $1',
       [id]
     );
@@ -164,7 +164,7 @@ export async function getFileById(id: string): Promise<FileInfo | undefined> {
 }
 
 // 保存文件信息
-export async function saveFile(fileInfo: FileInfo) {
+export async function saveFile(fileInfo: FileInfo): Promise<void> {
   const client = await pool.connect();
   
   try {
@@ -192,7 +192,7 @@ export async function saveFile(fileInfo: FileInfo) {
 }
 
 // 更新文件信息
-export async function updateFile(id: string, updates: Partial<FileInfo>) {
+export async function updateFile(id: string, updates: Partial<FileInfo>): Promise<boolean> {
   const client = await pool.connect();
   
   try {
@@ -249,7 +249,7 @@ export async function updateFile(id: string, updates: Partial<FileInfo>) {
     
     const query = `UPDATE file_info SET ${fields.join(', ')} WHERE id = $${index}`;
     
-    const result = await client.query(query, values);
+    const result: QueryResult<any> = await client.query(query, values);
     return (result.rowCount || 0) > 0;
   } finally {
     client.release();
@@ -257,11 +257,11 @@ export async function updateFile(id: string, updates: Partial<FileInfo>) {
 }
 
 // 删除文件信息
-export async function deleteFile(id: string) {
+export async function deleteFile(id: string): Promise<boolean> {
   const client = await pool.connect();
   
   try {
-    const result = await client.query(
+    const result: QueryResult<any> = await client.query(
       'DELETE FROM file_info WHERE id = $1',
       [id]
     );
@@ -285,7 +285,7 @@ export async function generateUniqueShareCode(): Promise<string> {
       shareCode = Math.floor(10000 + Math.random() * 90000).toString();
       
       // 检查是否唯一
-      const result = await client.query(
+      const result: QueryResult<any> = await client.query(
         'SELECT 1 FROM file_info WHERE share_code = $1',
         [shareCode]
       );
@@ -300,6 +300,6 @@ export async function generateUniqueShareCode(): Promise<string> {
 }
 
 // 初始化数据库
-export async function initDatabase() {
+export async function initDatabase(): Promise<void> {
   await initializeDatabase();
 }

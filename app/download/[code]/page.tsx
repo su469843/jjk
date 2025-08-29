@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useParams } from 'next/navigation';
+import Link from 'next/link';
 import BounceLoader from '@/components/BounceLoader';
 import AlertModal from '@/components/AlertModal';
+import { FileInfo } from '@/lib/datastore';
 
 export default function DownloadPage() {
   const params = useParams();
-  const code = params?.code;
+  const code = params?.code as string;
 
-  const [fileInfo, setFileInfo] = useState<any>(null);
+  const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
@@ -26,7 +28,7 @@ export default function DownloadPage() {
       }
 
       try {
-        const response = await fetch(`/api/file/${params.code}`);
+        const response = await fetch(`/api/file/${code}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -51,7 +53,7 @@ export default function DownloadPage() {
       setIsDownloading(true);
       
       // 请求下载，增加下载计数
-      const response = await fetch(`/api/file/${params.code}/download`, {
+      const response = await fetch(`/api/file/${code}/download`, {
         method: 'POST',
       });
 
@@ -68,8 +70,8 @@ export default function DownloadPage() {
         document.body.removeChild(link);
         
         // 更新本地的下载次数
-        setFileInfo((prev: any) => ({
-          ...prev,
+        setFileInfo((prev) => ({
+          ...prev!,
           downloadCount: (prev?.downloadCount ?? 0) + 1
         }));
       } else {
@@ -107,12 +109,12 @@ export default function DownloadPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">错误</h1>
           <p className="text-slate-600 mb-6">{error}</p>
-          <a 
+          <Link 
             href="/" 
             className="inline-block bg-gradient-to-b from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-md hover:shadow-lg"
           >
             返回首页
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -136,29 +138,29 @@ export default function DownloadPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-500 mb-1">文件名</p>
-                <p className="font-medium truncate">{fileInfo.fileName}</p>
+                <p className="font-medium truncate">{fileInfo?.fileName}</p>
               </div>
               
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-500 mb-1">文件类型</p>
                 <p className="font-medium">
-                  {fileInfo.type === 'blob' ? '上传文件' : '外部链接'}
+                  {fileInfo?.type === 'blob' ? '上传文件' : '外部链接'}
                 </p>
               </div>
               
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-500 mb-1">剩余下载次数</p>
                 <p className="font-medium">
-                  <span className={fileInfo.downloadLimit - fileInfo.downloadCount === 0 ? 'text-red-500' : 'text-green-500'}>
-                    {fileInfo.downloadLimit - fileInfo.downloadCount}
-                  </span> / {fileInfo.downloadLimit}
+                  <span className={(fileInfo?.downloadLimit ?? 0) - (fileInfo?.downloadCount ?? 0) === 0 ? 'text-red-500' : 'text-green-500'}>
+                    {(fileInfo?.downloadLimit ?? 0) - (fileInfo?.downloadCount ?? 0)}
+                  </span> / {fileInfo?.downloadLimit}
                 </p>
               </div>
               
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-500 mb-1">过期时间</p>
                 <p className="font-medium">
-                  {new Date(fileInfo.expiresAt).toLocaleString('zh-CN')}
+                  {fileInfo ? new Date(fileInfo.expiresAt).toLocaleString('zh-CN') : ''}
                 </p>
               </div>
             </div>
@@ -182,7 +184,7 @@ export default function DownloadPage() {
           </div>
           
           <div className="text-center">
-            <a 
+            <Link 
               href="/" 
               className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center"
             >
@@ -190,12 +192,12 @@ export default function DownloadPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
               返回首页
-            </a>
+            </Link>
           </div>
         </div>
       </div>
       
-      {showConfirmModal && (
+      {showConfirmModal && fileInfo && (
         <AlertModal
           title="确认下载"
           body={`您确定要下载文件 "${fileInfo.fileName}" 吗？下载后剩余次数将减少1次。`}

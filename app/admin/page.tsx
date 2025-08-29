@@ -1,20 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import BounceLoader from '@/components/BounceLoader';
 import AlertModal from '@/components/AlertModal';
+import { FileInfo } from '@/lib/datastore';
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<any>(null);
-  const router = useRouter();
+  const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
 
   // 简单的登录检查
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function AdminPage() {
     setFiles([]);
   };
 
-  const handleDeleteFile = (file: any) => {
+  const handleDeleteFile = (file: FileInfo) => {
     setSelectedFile(file);
     setShowDeleteModal(true);
   };
@@ -152,7 +152,7 @@ export default function AdminPage() {
                   ) : '登录'}
                 </button>
                 
-                <a 
+                <Link 
                   href="/" 
                   className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium"
                 >
@@ -160,7 +160,7 @@ export default function AdminPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                   </svg>
                   返回首页
-                </a>
+                </Link>
               </div>
             </form>
           </div>
@@ -284,13 +284,13 @@ export default function AdminPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
-                            <a 
+                            <Link 
                               href={`/download/${file.shareCode}`} 
                               target="_blank"
                               className="text-indigo-600 hover:text-indigo-900"
                             >
                               查看
-                            </a>
+                            </Link>
                             <button 
                               onClick={() => {
                                 // 这里可以实现编辑功能
