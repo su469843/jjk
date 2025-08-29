@@ -57,7 +57,7 @@ export default function Home() {
       } else {
         setError(result.error || '上传失败');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('网络错误，请稍后重试');
     } finally {
       setIsUploading(false);

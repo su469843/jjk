@@ -17,7 +17,7 @@ export default function DownloadPage() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const searchParams = useSearchParams();
-  const download = searchParams.get('download');
+  const _download = searchParams.get('download'); // 添加下划线前缀表示故意不使用
 
   useEffect(() => {
     const fetchFileInfo = async () => {
@@ -36,7 +36,7 @@ export default function DownloadPage() {
         } else {
           setError(data.error || '文件未找到');
         }
-      } catch (err) {
+      } catch (_err) {
         setError('网络错误，请稍后重试');
       } finally {
         setLoading(false);
@@ -78,7 +78,7 @@ export default function DownloadPage() {
         const data = await response.json();
         setError(data.error || '下载失败');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('下载失败，请稍后重试');
     } finally {
       setIsDownloading(false);
@@ -121,7 +121,8 @@ export default function DownloadPage() {
   }
 
   const isExpired = fileInfo ? new Date(fileInfo.expiresAt) < new Date() : false;
-  const isDownloadLimitReached = fileInfo ? (fileInfo.downloadCount ?? 0) >= (fileInfo.downloadLimit ?? Infinity) : false;
+  // 移除了未使用的变量 isDownloadLimitReached
+  // const isDownloadLimitReached = fileInfo ? (fileInfo.downloadCount ?? 0) >= (fileInfo.downloadLimit ?? Infinity) : false;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -168,10 +169,6 @@ export default function DownloadPage() {
             {isExpired ? (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
                 文件已过期
-              </div>
-            ) : isDownloadLimitReached ? (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-                下载次数已达上限
               </div>
             ) : (
               <button

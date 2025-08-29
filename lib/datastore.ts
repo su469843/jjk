@@ -1,7 +1,7 @@
 // 使用PostgreSQL数据库存储文件元数据
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, PoolClient } from 'pg';
 import dotenv from 'dotenv';
-import { v4 as uuidv4 } from 'uuid';
+// 移除了未使用的 uuid 导入
 
 dotenv.config();
 
@@ -34,9 +34,22 @@ export interface FileInfo {
   uploadTime: string; // ISO string format
 }
 
+interface FileInfoRow {
+  id: string;
+  file_name: string;
+  share_code: string;
+  type: 'blob' | 'externalLink';
+  blob_url: string | null;
+  external_url: string | null;
+  download_limit: number;
+  download_count: number;
+  expires_at: Date;
+  upload_time: Date;
+}
+
 // 初始化数据库表
 async function initializeDatabase(): Promise<void> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
     // 创建文件信息表
@@ -75,10 +88,10 @@ async function initializeDatabase(): Promise<void> {
 
 // 读取所有文件信息
 export async function getAllFiles(): Promise<FileInfo[]> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
-    const result: QueryResult<any> = await client.query(
+    const result: QueryResult<FileInfoRow> = await client.query(
       'SELECT * FROM file_info ORDER BY upload_time DESC'
     );
     
@@ -87,8 +100,8 @@ export async function getAllFiles(): Promise<FileInfo[]> {
       fileName: row.file_name,
       shareCode: row.share_code,
       type: row.type,
-      blobUrl: row.blob_url,
-      externalUrl: row.external_url,
+      blobUrl: row.blob_url || undefined,
+      externalUrl: row.external_url || undefined,
       downloadLimit: row.download_limit,
       downloadCount: row.download_count,
       expiresAt: row.expires_at.toISOString(),
@@ -101,10 +114,10 @@ export async function getAllFiles(): Promise<FileInfo[]> {
 
 // 根据分享码查找文件
 export async function getFileByShareCode(shareCode: string): Promise<FileInfo | undefined> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
-    const result: QueryResult<any> = await client.query(
+    const result: QueryResult<FileInfoRow> = await client.query(
       'SELECT * FROM file_info WHERE share_code = $1',
       [shareCode]
     );
@@ -119,8 +132,8 @@ export async function getFileByShareCode(shareCode: string): Promise<FileInfo | 
       fileName: row.file_name,
       shareCode: row.share_code,
       type: row.type,
-      blobUrl: row.blob_url,
-      externalUrl: row.external_url,
+      blobUrl: row.blob_url || undefined,
+      externalUrl: row.external_url || undefined,
       downloadLimit: row.download_limit,
       downloadCount: row.download_count,
       expiresAt: row.expires_at.toISOString(),
@@ -133,10 +146,10 @@ export async function getFileByShareCode(shareCode: string): Promise<FileInfo | 
 
 // 根据ID查找文件
 export async function getFileById(id: string): Promise<FileInfo | undefined> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
-    const result: QueryResult<any> = await client.query(
+    const result: QueryResult<FileInfoRow> = await client.query(
       'SELECT * FROM file_info WHERE id = $1',
       [id]
     );
@@ -151,8 +164,8 @@ export async function getFileById(id: string): Promise<FileInfo | undefined> {
       fileName: row.file_name,
       shareCode: row.share_code,
       type: row.type,
-      blobUrl: row.blob_url,
-      externalUrl: row.external_url,
+      blobUrl: row.blob_url || undefined,
+      externalUrl: row.external_url || undefined,
       downloadLimit: row.download_limit,
       downloadCount: row.download_count,
       expiresAt: row.expires_at.toISOString(),
@@ -165,7 +178,7 @@ export async function getFileById(id: string): Promise<FileInfo | undefined> {
 
 // 保存文件信息
 export async function saveFile(fileInfo: FileInfo): Promise<void> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
     await client.query(
@@ -193,7 +206,7 @@ export async function saveFile(fileInfo: FileInfo): Promise<void> {
 
 // 更新文件信息
 export async function updateFile(id: string, updates: Partial<FileInfo>): Promise<boolean> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
     const fields: string[] = [];
@@ -249,7 +262,7 @@ export async function updateFile(id: string, updates: Partial<FileInfo>): Promis
     
     const query = `UPDATE file_info SET ${fields.join(', ')} WHERE id = $${index}`;
     
-    const result: QueryResult<any> = await client.query(query, values);
+    const result: QueryResult = await client.query(query, values);
     return (result.rowCount || 0) > 0;
   } finally {
     client.release();
@@ -258,10 +271,10 @@ export async function updateFile(id: string, updates: Partial<FileInfo>): Promis
 
 // 删除文件信息
 export async function deleteFile(id: string): Promise<boolean> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
-    const result: QueryResult<any> = await client.query(
+    const result: QueryResult = await client.query(
       'DELETE FROM file_info WHERE id = $1',
       [id]
     );
@@ -274,7 +287,7 @@ export async function deleteFile(id: string): Promise<boolean> {
 
 // 生成唯一的5位数字分享码
 export async function generateUniqueShareCode(): Promise<string> {
-  const client = await pool.connect();
+  const client: PoolClient = await pool.connect();
   
   try {
     let shareCode: string;
@@ -285,7 +298,7 @@ export async function generateUniqueShareCode(): Promise<string> {
       shareCode = Math.floor(10000 + Math.random() * 90000).toString();
       
       // 检查是否唯一
-      const result: QueryResult<any> = await client.query(
+      const result: QueryResult = await client.query(
         'SELECT 1 FROM file_info WHERE share_code = $1',
         [shareCode]
       );

@@ -57,7 +57,7 @@ export default function AdminPage() {
       } else {
         setError(data.error || '加载文件列表失败');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('网络错误，请稍后重试');
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export default function AdminPage() {
       setFiles(files.filter(f => f.id !== selectedFile.id));
       setShowDeleteModal(false);
       setSelectedFile(null);
-    } catch (err) {
+    } catch (_err) {
       setError('删除失败，请稍后重试');
     }
   };
@@ -246,7 +246,8 @@ export default function AdminPage() {
                 ) : (
                   files.map((file) => {
                     const isExpired = new Date(file.expiresAt) < new Date();
-                    const isDownloadLimitReached = file.downloadCount >= file.downloadLimit;
+                    // 移除了未使用的变量 isDownloadLimitReached
+                    // const isDownloadLimitReached = file.downloadCount >= file.downloadLimit;
                     
                     return (
                       <tr key={file.id} className="hover:bg-slate-50">

@@ -5,7 +5,7 @@ import { getFileByShareCode, updateFile, initDatabase } from '@/lib/datastore';
 initDatabase().catch(console.error);
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { code: string } }
 ) {
   try {

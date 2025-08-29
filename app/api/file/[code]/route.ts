@@ -5,7 +5,7 @@ import { getFileByShareCode, initDatabase } from '@/lib/datastore';
 initDatabase().catch(console.error);
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { code: string } }
 ) {
   try {
@@ -26,7 +26,8 @@ export async function GET(
     }
 
     // 返回文件信息（不包括敏感信息）
-    const { blobUrl, externalUrl, ...safeFileInfo } = file;
+    // 移除了未使用的变量 blobUrl 和 externalUrl
+    const { blobUrl: _blobUrl, externalUrl: _externalUrl, ...safeFileInfo } = file; // 添加下划线前缀表示故意不使用
     return Response.json(safeFileInfo);
   } catch (error) {
     console.error('获取文件信息错误:', error);
